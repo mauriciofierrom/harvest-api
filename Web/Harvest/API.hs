@@ -60,6 +60,7 @@ type Query a = BasicAuthData -> Manager -> BaseUrl -> ClientM a
 
 getUsers_       :: Query [User]
 getTimeEntries_ :: Word -> Word -> Maybe UserId -> Query TimeEntries
+getProjects_    :: Query [Project]
 
 getUsers_ :<|> getTimeEntries_ = client (Proxy :: Proxy HarvestAPI)
 
@@ -83,6 +84,11 @@ getTimeEntries manager creds date uid =
   runHarvestQuery (getTimeEntries_ day year (Just uid)) manager creds
   where (day, year) = getDayAndYear date
 
+getProjects :: MonadIO m
+            => Manager
+            -> Credentials
+            -> m (Either ServantError [Project])
+getProjects = runHarvestQuery getProjects_
 -- | A helper to run a query against Harvest API.
 
 runHarvestQuery :: MonadIO m

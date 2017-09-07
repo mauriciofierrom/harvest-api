@@ -154,3 +154,67 @@ instance FromJSON TimeEntry where
     teHoursWithoutTimer <- o .: "hours_without_timer"
     teHours          <- o .: "hours"
     return TimeEntry {..}
+
+newtype ProjectId = ProjectId
+  { unProjectId :: Word }
+  deriving (Eq, Ord, Show, FromJSON)
+
+data Project = Project
+  { pId :: ProjectId
+  , pClientId                         :: ClientId
+  , pName                             :: Text
+  , pCode                             :: Text
+  , pIsActive                         :: Bool
+  , pIsBillable                       :: Bool
+  , pIsFixedFee                       :: Bool
+  , pFee                              :: Double
+  , pBillBy                           :: Text
+  , pHourlyRate                       :: Double
+  , pBudget                           :: Double
+  , pBudgetBy                         :: Text
+  , pNotifyWhenOverBudget :: Bool
+  , pOverBudgetNotificationPercentage :: Bool
+  , pOverBudgetNotifiedAt             :: Maybe UTCTime
+  , pShowBudgetToAll                  :: Bool
+  , pCreatedAt                        :: UTCTime
+  , pUpdatedAt                        :: UTCTime
+  , pStartsOn                         :: UTCTime
+  , pEndsOn                           :: UTCTime
+  , pEstimate                         :: Double
+  , pEstimateBy                       :: Text
+  , pHintEarliestRecordAt             :: UTCTime
+  , pHintLatestRecordAt               :: UTCTime
+  , pNotes                            :: Text
+  , pCostBudget                       :: Maybe Double
+  , pCostBudgetIncludeExpenses        :: Bool
+  } deriving (Eq, Ord, Show)
+
+instance FromJSON Project where
+  parseJSON = withObject "Project" $ \o -> do
+    pId                               <- o .: "id"
+    pClientId                         <- o .: "client_id"
+    pName                             <- o .: "name"
+    pCode                             <- o .: "code"
+    pIsActive                         <- o .: "active"
+    pIsBillable                       <- o .: "billable"
+    pIsFixedFee                       <- o .: "is_fixed_fee"
+    pFee                              <- o .: "fee"
+    pBillBy                           <- o .: "bill_by"
+    pHourlyRate                       <- o .: "hourly_rate"
+    pBudget                           <- o .: "budget"
+    pBudgetBy                         <- o .: "budget_by"
+    pNotifyWhenOverBudget             <- o .: "notify_when_over_budget"
+    pOverBudgetNotificationPercentage <- o .: "over_budget_notification_percentage"
+    pOverBudgetNotifiedAt             <- o .: "over_budget_notified_at"
+    pShowBudgetToAll                  <- o .: "show_budget_to_all"
+    pCreatedAt                        <- o .: "created_at"
+    pUpdatedAt                        <- o .: "updated_at"
+    pStartsOn                         <- o .: "starts_on"
+    pEndsOn                           <- o .: "ends_on"
+    pEstimate                         <- o .: "estimate"
+    pEstimateBy                       <- o .: "estimate_by"
+    pHintEarliestRecordAt             <- o .: "hint_earliest_record_at"
+    pHintLatestRecordAt               <- o .: "hint_latest_record_at"
+    pNotes                            <- o .: "notes"
+    pCostBudget                       <- o .: "cost_budget"
+    pCostBudgetIncludeExpenses        <- o .: "cost_budget_include_expenses"
