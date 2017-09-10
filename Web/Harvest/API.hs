@@ -20,6 +20,12 @@ module Web.Harvest.API
     module Web.Harvest.API.Type
     -- * Users
   , getUsers
+    -- * Projects
+  , getProjects
+    -- * Tasks
+  , getTasks
+    -- * TaskAssignments
+  , getTaskAssignments
     -- * Timesheets
   , getTimeEntries )
 where
@@ -53,6 +59,9 @@ type HarvestAPI =
   :<|> "daily"  :> Capture "day" Word :> Capture "year" Word
                 :> QueryParam "of_user" UserId
                 :> Auth :> Get '[JSON] TimeEntries
+  :<|> "project" :> Auth :> Get '[JSON] [Project]
+  :<|> "task"   :> Auth :> Get '[JSON] [Task]
+  :<|> "task-assignment" :> Auth :> Get '[JSON] [TaskAssignment]
 
 -- | A shortcut for the boilerplate arguments.
 
@@ -61,8 +70,10 @@ type Query a = BasicAuthData -> Manager -> BaseUrl -> ClientM a
 getUsers_       :: Query [User]
 getTimeEntries_ :: Word -> Word -> Maybe UserId -> Query TimeEntries
 getProjects_    :: Query [Project]
+getTasks_       :: Query [Task]
+getTaskAssignments_ :: Query [TaskAssignment]
 
-getUsers_ :<|> getTimeEntries_ = client (Proxy :: Proxy HarvestAPI)
+getUsers_ :<|> getTimeEntries_ :<|> getProjects_ :<|> getTasks_ :<|> getTaskAssignments_ = client (Proxy :: Proxy HarvestAPI)
 
 -- | Get list of all users for specific account.
 
@@ -84,11 +95,31 @@ getTimeEntries manager creds date uid =
   runHarvestQuery (getTimeEntries_ day year (Just uid)) manager creds
   where (day, year) = getDayAndYear date
 
+-- | Get list of all projects for specific account.
+
 getProjects :: MonadIO m
             => Manager
             -> Credentials
             -> m (Either ServantError [Project])
 getProjects = runHarvestQuery getProjects_
+
+-- | Get list of all tasks for specific account
+
+getTasks :: MonadIO m
+         => Manager
+         -> Credentials
+         -> m (Either ServantError [Task])
+getTasks = runHarvestQuery getTasks_
+
+-- | Get list of all project task assignments for specific account.
+
+getTaskAssignments :: MonadIO m
+                   => Manager
+                   -> Credentials
+                   -> m (Either ServantError [TaskAssignment])
+getTaskAssignments = runHarvestQuery getTaskAssignments_
+
+
 -- | A helper to run a query against Harvest API.
 
 runHarvestQuery :: MonadIO m

@@ -17,8 +17,15 @@
 
 module Web.Harvest.API.Type
   ( Credentials (..)
+  , ClientId (..)
   , UserId (..)
   , User (..)
+  , ProjectId (..)
+  , Project (..)
+  , TaskId (..)
+  , Task (..)
+  , TaskAssignmentId (..)
+  , TaskAssignment (..)
   , TimeEntryId (..)
   , TimeEntries (..)
   , TimeEntry (..) )
@@ -156,7 +163,11 @@ instance FromJSON TimeEntry where
     return TimeEntry {..}
 
 newtype ProjectId = ProjectId
-  { unProjectId :: Word }
+  { unProjectId :: Word}
+  deriving (Eq, Ord, Show, FromJSON)
+
+newtype ClientId = ClientId
+  { unClientId :: Word }
   deriving (Eq, Ord, Show, FromJSON)
 
 data Project = Project
@@ -218,3 +229,62 @@ instance FromJSON Project where
     pNotes                            <- o .: "notes"
     pCostBudget                       <- o .: "cost_budget"
     pCostBudgetIncludeExpenses        <- o .: "cost_budget_include_expenses"
+    return Project{..}
+
+newtype TaskId = TaskId
+  { unTaskId :: Word }
+  deriving (Eq, Ord, Show, FromJSON)
+
+data Task = Task
+  { taskId                :: TaskId
+  , taskName              :: Text
+  , taskBillableByDefault :: Bool
+  , taskCreatedAt         :: UTCTime
+  , taskUpdatedAt         :: UTCTime
+  , taskIsDefault         :: Bool
+  , taskDefaultHourlyRate :: Double
+  , taskDeactivated       :: Bool
+  } deriving (Eq, Ord, Show)
+
+instance FromJSON Task where
+  parseJSON = withObject "task" $ \o -> do
+    taskId                <- o .: "id"
+    taskName              <- o .: "id"
+    taskBillableByDefault <- o .: "id"
+    taskCreatedAt         <- o .: "id"
+    taskUpdatedAt         <- o .: "id"
+    taskIsDefault         <- o .: "id"
+    taskDefaultHourlyRate <- o .: "id"
+    taskDeactivated       <- o .: "id"
+    return Task{..}
+
+newtype TaskAssignmentId  = TaskAssignmentId
+  { unTaskAssignmentId :: Word }
+  deriving (Eq, Ord, Show, FromJSON)
+
+data TaskAssignment = TaskAssignment
+  { taProjectId :: ProjectId
+  , taTaskId    :: TaskId
+  , taBillable  :: Bool
+  , taDeactivated :: Bool
+  , taHourlyRate  :: Double
+  , taBudget      :: Maybe Double
+  , taId          :: TaskAssignmentId
+  , taCreatedAt   :: UTCTime
+  , taUpdatedAt   :: UTCTime
+  , taEstimate    :: Maybe Double
+  } deriving (Eq, Ord, Show)
+
+instance FromJSON TaskAssignment where
+  parseJSON = withObject "TaskAssignment" $ \o -> do
+    taProjectId   <- o .: "project_id"
+    taTaskId      <- o .: "project_id"
+    taBillable    <- o .: "project_id"
+    taDeactivated <- o .: "project_id"
+    taHourlyRate  <- o .: "project_id"
+    taBudget      <- o .: "project_id"
+    taId          <- o .: "project_id"
+    taCreatedAt   <- o .: "project_id"
+    taUpdatedAt   <- o .: "project_id"
+    taEstimate    <- o .: "project_id"
+    return TaskAssignment{..}
